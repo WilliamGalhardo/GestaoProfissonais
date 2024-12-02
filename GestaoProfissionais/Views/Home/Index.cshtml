@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Profissionais";
+}
+
+<h2>Profissionais</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cadastroModal">Cadastrar</button>
+
+<!-- Modal Cadastro -->
+<div class="modal fade" id="cadastroModal" tabindex="-1" aria-labelledby="cadastroModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cadastroModalLabel">Cadastrar Profissional</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" name="Nome" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="especialidade" class="form-label">Especialidade</label>
+                        <select class="form-select" id="especialidade" name="EspecialidadeId" required>
+                            @if (ViewBag.Especialidades != null && ViewBag.Especialidades.Any())
+                            {
+                                @foreach (var especialidade in ViewBag.Especialidades)
+                                {
+                                    <option value="@especialidade.Id"
+                                            selected="@(especialidade.Id == Model.EspecialidadeId ? "selected" : "")">
+                                        @especialidade.Nome
+                                    </option>
+
+                                }
+                            }
+                            else
+                            {
+                                <option value="">Nenhuma especialidade disponível</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
+                        <select class="form-select" id="tipoDocumento" name="TipoDocumento" required>
+                            <option value="CRM">CRM</option>
+                            <option value="CRN">CRN</option>
+                            <option value="CREFITO">CREFITO</option>
+                            <option value="CRO">CRO</option>
+                            <option value="COREN">COREN</option>
+                            <option value="CRP">CRP</option>
+                            <option value="CRF">CRF</option>
+                            <option value="CREF">CREF</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="numeroDocumento" class="form-label">Número do Documento</label>
+                        <input type="text" class="form-control" id="numeroDocumento" name="NumeroDocumento" required />
+                    </div>
+                    <button type="submit" class="btn btn-success">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nome</th>
+            <th>Especialidade</th>
+            <th>Tipo Documento</th>
+            <th>Número Documento</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var profissional in Model)
+        {
+            <tr>
+                <td>@profissional.Id</td>
+                <td>@profissional.Nome</td>
+                <td>
+                    @if (profissional.Especialidade != null)
+                    {
+                        @profissional.Especialidade.Nome
+                    }
+                    else
+                    {
+                        <span>Sem especialidade</span>
+                    }
+                </td>
+                <td>@(profissional.TipoDocumento ?? "Documento não informado")</td>
+                <td>@(profissional.NumeroDocumento ?? "Número não informado")</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = profissional.Id })" class="btn btn-warning">Editar</a>
+                    <form method="post" action="@Url.Action("Delete", new { id = profissional.Id })" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
